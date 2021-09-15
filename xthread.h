@@ -95,10 +95,10 @@ namespace top
                 enum_xthread_type_all       =  0xFFFF
             };
         public:
-            static xiothread_t*   create_thread(xcontext_t & _context,const int32_t thread_type,const int32_t time_out_ms);//thread_type refer enum_xthread_type
-            static xiothread_t*   async_create_thread(xcontext_t & _context,const int32_t thread_type); //return immediately without waiting
+            static xiothread_t*   create_thread(xcontext_t & _context,const int32_t thread_type,const int32_t time_out_ms,const std::string thread_name=std::string());//thread_type refer enum_xthread_type
+            static xiothread_t*   async_create_thread(xcontext_t & _context,const int32_t thread_type,const std::string thread_name=std::string()); //return immediately without waiting
         public:
-            xiothread_t(xcontext_t & _context,const int thread_type);//refer enum_xthread_type
+            xiothread_t(xcontext_t & _context,const int thread_type,const std::string & thread_name);//refer enum_xthread_type
         protected:
             virtual ~xiothread_t();
         private:
@@ -118,6 +118,8 @@ namespace top
             virtual uint64_t    update_time_now() const = 0; //trigger refresh time to more accurately and return latest time now.carefully: it ask call under this thread
             int32_t             get_thread_id()   const {return m_thread_id;} //return real thread' id
             int                 get_thread_type() const {return m_thread_type;}
+            const std::string   get_thread_name() const {return m_thread_name;}
+            
         public:
             //multiple thread safe,return error code if fail, refer enum_xerror_code
             //Note: signal/post api execute the xcall_t at target thread through it's own mailbox or the thread'mailbox
@@ -154,6 +156,7 @@ namespace top
             xmailbox_t*         m_ptr_mailbox;       //each thread has own mailbox
             int32_t             m_thread_id;         //logic thread id instead of system'pthread
             int32_t             m_thread_type;       //different thread type
+            std::string         m_thread_name;       //
         };
 
         //worker thread that has own dedicated timer
